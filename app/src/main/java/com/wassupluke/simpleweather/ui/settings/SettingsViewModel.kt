@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 data class SettingsUiState(
     val useDeviceLocation: Boolean = false,
@@ -22,6 +23,7 @@ data class SettingsUiState(
     val tempUnit: String = WeatherDataStore.DEFAULT_TEMP_UNIT,
     val updateIntervalMinutes: Int = WeatherDataStore.DEFAULT_INTERVAL_MINUTES,
     val widgetTextColor: String = "white",
+    val widgetDynamicColor: Boolean = true,
     val widgetTapPackage: String = ""
 )
 
@@ -32,17 +34,28 @@ class SettingsViewModel(
 ) : AndroidViewModel(application) {
     private val context: Application = application
 
-    val uiState: StateFlow<SettingsUiState> = context.dataStore.data.map { prefs ->
-        SettingsUiState(
+    private fun prefsToUiState(prefs: androidx.datastore.preferences.core.Preferences): SettingsUiState {
+        val storedDynamic = prefs[WeatherDataStore.WIDGET_DYNAMIC_COLOR]
+        val dynamicColor = storedDynamic ?: (prefs[WeatherDataStore.WIDGET_TEXT_COLOR] == null)
+        return SettingsUiState(
             useDeviceLocation = prefs[WeatherDataStore.USE_DEVICE_LOCATION] ?: false,
             locationQuery = prefs[WeatherDataStore.LOCATION_QUERY] ?: "",
             locationDisplayName = prefs[WeatherDataStore.LOCATION_DISPLAY_NAME] ?: "",
             tempUnit = prefs[WeatherDataStore.TEMP_UNIT] ?: WeatherDataStore.DEFAULT_TEMP_UNIT,
             updateIntervalMinutes = prefs[WeatherDataStore.UPDATE_INTERVAL_MINUTES] ?: WeatherDataStore.DEFAULT_INTERVAL_MINUTES,
             widgetTextColor = prefs[WeatherDataStore.WIDGET_TEXT_COLOR] ?: "white",
+            widgetDynamicColor = dynamicColor,
             widgetTapPackage = prefs[WeatherDataStore.WIDGET_TAP_PACKAGE] ?: ""
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
+    }
+
+    private val initialUiState: SettingsUiState = runBlocking {
+        prefsToUiState(context.dataStore.data.first())
+    }
+
+    val uiState: StateFlow<SettingsUiState> = context.dataStore.data.map { prefs ->
+        prefsToUiState(prefs)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), initialUiState)
 
     fun setTempUnit(unit: String) {
         viewModelScope.launch(dispatcher) {
@@ -61,6 +74,13 @@ class SettingsViewModel(
     fun setWidgetTextColor(raw: String) {
         viewModelScope.launch(dispatcher) {
             context.dataStore.edit { it[WeatherDataStore.WIDGET_TEXT_COLOR] = raw }
+            WeatherWidget().updateAll(context)
+        }
+    }
+
+    fun setWidgetDynamicColor(enabled: Boolean) {
+        viewModelScope.launch(dispatcher) {
+            context.dataStore.edit { it[WeatherDataStore.WIDGET_DYNAMIC_COLOR] = enabled }
             WeatherWidget().updateAll(context)
         }
     }

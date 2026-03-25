@@ -76,18 +76,20 @@ internal fun SettingsScreenContent(
     var showAppPicker by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val installedApps = remember {
-        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val apps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.queryIntentActivities(
-                intent,
-                PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+    val installedApps by produceState<List<android.content.pm.ResolveInfo>>(emptyList()) {
+        value = withContext(Dispatchers.IO) {
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+            val apps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.queryIntentActivities(
+                    intent,
+                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
+            apps.sortedBy { it.loadLabel(context.packageManager).toString() }
         }
-        apps.sortedBy { it.loadLabel(context.packageManager).toString() }
     }
 
     Scaffold(

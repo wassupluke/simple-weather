@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'app/**'
+      - '*.gradle.kts'
+      - 'gradle/**'
+      - '.github/workflows/dev-release.yml'
+
 
 jobs:
   build:

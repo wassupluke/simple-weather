@@ -9,7 +9,9 @@
 
     <string name="title_temperature_unit">Temperature Unit</string>
     <string name="title_update_interval">Update Interval</string>
+    <string name="title_widget_appearance">Widget Appearance</string>
     <string name="title_widget_text_color">Widget Text Color</string>
+    <string name="label_dynamic_color">Dynamic color</string>
     <string name="label_text_color">Text color</string>
     <string name="hint_color_input">#RRGGBB, #AARRGGBB, or name like red</string>
     <string name="error_invalid_color">Invalid color — enter a hex value or name like \"red\"</string>

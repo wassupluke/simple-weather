@@ -24,7 +24,7 @@ data class SettingsUiState(
     val tempUnit: String = WeatherDataStore.DEFAULT_TEMP_UNIT,
     val updateIntervalMinutes: Int = WeatherDataStore.DEFAULT_INTERVAL_MINUTES,
     val widgetTextColor: String = "white",
-    val widgetDynamicColor: Boolean = true,
+    val widgetDynamicColor: Boolean = false,
     val widgetTapPackage: String = ""
 )
 

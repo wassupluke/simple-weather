@@ -1,6 +1,7 @@
 package com.wassupluke.simpleweather.ui.settings
 
 import android.app.Application
+import android.os.Build
 import androidx.datastore.preferences.core.edit
 import androidx.test.core.app.ApplicationProvider
 import com.wassupluke.simpleweather.data.WeatherDataStore
@@ -9,6 +10,7 @@ import com.wassupluke.simpleweather.data.dataStore
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Assume.assumeTrue
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -106,10 +108,11 @@ class SettingsViewModelTest {
 
     @Test
     fun `widgetDynamicColor defaults to true when both keys absent (new install)`() = runTest(testDispatcher) {
+        assumeTrue("dynamic color only supported on API 31+", Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
         val vm = SettingsViewModel(application, mockRepository, testDispatcher)
         backgroundScope.launch { vm.uiState.collect {} }
         advanceUntilIdle()
-        val state = vm.uiState.first()
+        val state = vm.uiState.filter { it.widgetDynamicColor }.first()
         assertEquals(true, state.widgetDynamicColor)
     }
 

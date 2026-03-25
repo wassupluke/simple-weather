@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.glance.*
+import androidx.glance.action.Action
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -46,7 +47,16 @@ class WeatherWidget : GlanceAppWidget() {
                 )
             } ?: androidx.compose.ui.graphics.Color.White
 
-            WeatherWidgetContent(displayTemp = displayTemp, textColor = textColor)
+            val tapPackage = prefs[WeatherDataStore.WIDGET_TAP_PACKAGE]
+            val tapAction = if (!tapPackage.isNullOrEmpty()) {
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(tapPackage)
+                if (launchIntent?.component != null) actionStartActivity(launchIntent.component!!)
+                else actionStartActivity<MainActivity>()
+            } else {
+                actionStartActivity<MainActivity>()
+            }
+
+            WeatherWidgetContent(displayTemp = displayTemp, textColor = textColor, tapAction = tapAction)
         }
     }
 
@@ -58,12 +68,13 @@ class WeatherWidget : GlanceAppWidget() {
 @Composable
 private fun WeatherWidgetContent(
     displayTemp: String,
-    textColor: androidx.compose.ui.graphics.Color
+    textColor: androidx.compose.ui.graphics.Color,
+    tapAction: Action
 ) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .clickable(actionStartActivity<MainActivity>()),
+            .clickable(tapAction),
         contentAlignment = Alignment.Center
     ) {
         Text(

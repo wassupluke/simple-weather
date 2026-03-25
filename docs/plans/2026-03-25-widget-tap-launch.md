@@ -182,9 +182,16 @@ var showAppPicker by remember { mutableStateOf(false) }
 val context = LocalContext.current
 val installedApps = remember {
     val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-    context.packageManager
-        .queryIntentActivities(intent, 0)
-        .sortedBy { it.loadLabel(context.packageManager).toString() }
+    val apps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager.queryIntentActivities(
+            intent,
+            PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+    }
+    apps.sortedBy { it.loadLabel(context.packageManager).toString() }
 }
 ```
 
@@ -253,7 +260,7 @@ Row(
         )
     }
     Icon(
-        imageVector = Icons.Default.ChevronRight,
+        imageVector = Icons.Default.KeyboardArrowRight,
         contentDescription = null,
         tint = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -263,7 +270,7 @@ if (showAppPicker) {
     ModalBottomSheet(onDismissRequest = { showAppPicker = false }) {
         LazyColumn {
             items(installedApps) { resolveInfo ->
-                val pkg = resolveInfo.activityInfo.packageName
+                val pkg = resolveInfo.activityInfo.applicationInfo.packageName
                 val label = resolveInfo.loadLabel(context.packageManager).toString()
                 val appIcon by produceState<ImageBitmap?>(null, pkg) {
                     value = withContext(Dispatchers.IO) {
@@ -319,8 +326,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.getValue
@@ -336,10 +345,19 @@ import kotlinx.coroutines.withContext
 
 **Step 5: Wire up in SettingsScreen**
 
-In the `SettingsScreen` composable, add the callback to `SettingsScreenContent`:
+Replace the existing `SettingsScreenContent(...)` call inside `SettingsScreen` with the full updated block (note the added trailing comma on `onSetWidgetTextColor` and the new parameter):
 
 ```kotlin
-onSetWidgetTapPackage = { viewModel.setWidgetTapPackage(it) },
+SettingsScreenContent(
+    uiState = uiState,
+    onRequestDeviceLocation = { locationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION) },
+    onDisableDeviceLocation = { viewModel.setUseDeviceLocation(false) },
+    onSetLocation = { viewModel.resolveAndSaveLocation(it) },
+    onSetTempUnit = { viewModel.setTempUnit(it) },
+    onSetUpdateInterval = { viewModel.setUpdateInterval(it) },
+    onSetWidgetTextColor = { viewModel.setWidgetTextColor(it) },
+    onSetWidgetTapPackage = { viewModel.setWidgetTapPackage(it) },
+)
 ```
 
 **Step 6: Add string resources**

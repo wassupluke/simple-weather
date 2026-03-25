@@ -22,4 +22,8 @@
     <string name="interval_6hr">6 hr</string>
 
     <string name="action_set">Set</string>
+
+    <string name="title_widget_tap_action">Widget tap action</string>
+    <string name="label_widget_tap_none">None (opens Simple Weather)</string>
+    <string name="label_selected_app_not_found">Selected app not found</string>
 </resources>

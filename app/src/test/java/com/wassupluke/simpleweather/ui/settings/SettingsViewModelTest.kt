@@ -82,4 +82,24 @@ class SettingsViewModelTest {
         val state = vm.uiState.first()
         assertEquals("white", state.widgetTextColor)
     }
+
+    @Test
+    fun `setWidgetTapPackage writes to DataStore`() = runTest(testDispatcher) {
+        val vm = SettingsViewModel(application, mockRepository, testDispatcher)
+        backgroundScope.launch { vm.uiState.collect {} }
+        advanceUntilIdle()
+        vm.setWidgetTapPackage("com.example.weather")
+        advanceUntilIdle()
+        val state = vm.uiState.filter { it.widgetTapPackage == "com.example.weather" }.first()
+        assertEquals("com.example.weather", state.widgetTapPackage)
+    }
+
+    @Test
+    fun `widgetTapPackage defaults to empty string when key absent`() = runTest(testDispatcher) {
+        val vm = SettingsViewModel(application, mockRepository, testDispatcher)
+        backgroundScope.launch { vm.uiState.collect {} }
+        advanceUntilIdle()
+        val state = vm.uiState.first()
+        assertEquals("", state.widgetTapPackage)
+    }
 }

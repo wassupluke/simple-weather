@@ -1,30 +1,47 @@
 package com.wassupluke.simpleweather.ui.settings
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wassupluke.simpleweather.R
 import com.wassupluke.simpleweather.data.parseColorSafe
 import com.wassupluke.simpleweather.ui.theme.SimpleWeatherTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+private data class AppEntry(val pkg: String, val label: String, val icon: ImageBitmap?)
 
 @Composable
 private fun SetButton(onClick: () -> Unit) {
@@ -47,6 +64,7 @@ internal fun SettingsScreenContent(
     onSetTempUnit: (String) -> Unit,
     onSetUpdateInterval: (Int) -> Unit,
     onSetWidgetTextColor: (String) -> Unit,
+    onSetWidgetTapPackage: (String) -> Unit,
 ) {
     var locationInput by remember { mutableStateOf("") }
     var locationInputInitialized by remember { mutableStateOf(false) }
@@ -54,6 +72,35 @@ internal fun SettingsScreenContent(
         if (!locationInputInitialized && uiState.locationQuery.isNotEmpty()) {
             locationInput = uiState.locationQuery
             locationInputInitialized = true
+        }
+    }
+
+    var showAppPicker by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val installedApps by produceState<List<AppEntry>>(emptyList()) {
+        value = withContext(Dispatchers.IO) {
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+            val apps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.queryIntentActivities(
+                    intent,
+                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
+            apps.sortedBy { it.loadLabel(context.packageManager).toString() }
+                .map { resolveInfo ->
+                    val pkg = resolveInfo.activityInfo.applicationInfo.packageName
+                    AppEntry(
+                        pkg = pkg,
+                        label = resolveInfo.loadLabel(context.packageManager).toString(),
+                        icon = runCatching {
+                            context.packageManager.getApplicationIcon(pkg).toBitmap().asImageBitmap()
+                        }.getOrNull()
+                    )
+                }
         }
     }
 
@@ -224,6 +271,135 @@ internal fun SettingsScreenContent(
                 )
             }
 
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            Text(
+                stringResource(R.string.title_widget_tap_action),
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            val selectedAppInfo = remember(uiState.widgetTapPackage) {
+                if (uiState.widgetTapPackage.isEmpty()) null
+                else runCatching {
+                    context.packageManager.getApplicationInfo(uiState.widgetTapPackage, 0)
+                }.getOrNull()
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showAppPicker = true }
+                    .padding(vertical = 8.dp)
+            ) {
+                if (selectedAppInfo != null) {
+                    val icon by produceState<ImageBitmap?>(null, uiState.widgetTapPackage) {
+                        value = withContext(Dispatchers.IO) {
+                            runCatching {
+                                context.packageManager
+                                    .getApplicationIcon(uiState.widgetTapPackage)
+                                    .toBitmap()
+                                    .asImageBitmap()
+                            }.getOrNull()
+                        }
+                    }
+                    if (icon != null) {
+                        Image(
+                            bitmap = icon!!,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp).padding(end = 8.dp)
+                        )
+                    } else {
+                        Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    }
+                    Text(
+                        text = selectedAppInfo.loadLabel(context.packageManager).toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                } else if (uiState.widgetTapPackage.isNotEmpty()) {
+                    Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    Text(
+                        text = stringResource(R.string.label_selected_app_not_found),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    Text(
+                        text = stringResource(R.string.label_widget_tap_none),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (showAppPicker) {
+                ModalBottomSheet(onDismissRequest = { showAppPicker = false }) {
+                    LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onSetWidgetTapPackage("")
+                                        showAppPicker = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                Spacer(Modifier.size(40.dp).padding(end = 12.dp))
+                                Text(
+                                    text = stringResource(R.string.label_widget_tap_none),
+                                    modifier = Modifier.weight(1f)
+                                )
+                                if (uiState.widgetTapPackage.isEmpty()) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                        items(installedApps) { entry ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onSetWidgetTapPackage(entry.pkg)
+                                        showAppPicker = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                if (entry.icon != null) {
+                                    Image(
+                                        bitmap = entry.icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(40.dp).padding(end = 12.dp)
+                                    )
+                                } else {
+                                    Spacer(Modifier.size(40.dp).padding(end = 12.dp))
+                                }
+                                Text(entry.label, modifier = Modifier.weight(1f))
+                                if (entry.pkg == uiState.widgetTapPackage) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -253,6 +429,7 @@ fun SettingsScreen(
         onSetTempUnit = { viewModel.setTempUnit(it) },
         onSetUpdateInterval = { viewModel.setUpdateInterval(it) },
         onSetWidgetTextColor = { viewModel.setWidgetTextColor(it) },
+        onSetWidgetTapPackage = { viewModel.setWidgetTapPackage(it) },
     )
 }
 
@@ -278,6 +455,7 @@ private fun SettingsScreenEmptyPreview() {
             onSetTempUnit = {},
             onSetUpdateInterval = {},
             onSetWidgetTextColor = {},
+            onSetWidgetTapPackage = {},
         )
     }
 }
@@ -297,6 +475,7 @@ private fun SettingsScreenDeviceLocationPreview() {
             onSetTempUnit = {},
             onSetUpdateInterval = {},
             onSetWidgetTextColor = {},
+            onSetWidgetTapPackage = {},
         )
     }
 }
@@ -320,6 +499,7 @@ private fun SettingsScreenManualLocationPreview() {
             onSetTempUnit = {},
             onSetUpdateInterval = {},
             onSetWidgetTextColor = {},
+            onSetWidgetTapPackage = {},
         )
     }
 }

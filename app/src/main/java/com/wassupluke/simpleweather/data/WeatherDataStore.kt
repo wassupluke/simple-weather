@@ -44,4 +44,5 @@ object WeatherDataStore {
     val LAST_TEMP_CELSIUS = floatPreferencesKey("last_temp_celsius")
     val LAST_UPDATED_EPOCH = longPreferencesKey("last_updated_epoch")
     val WIDGET_TEXT_COLOR = stringPreferencesKey("widget_text_color")
+    val WIDGET_TAP_PACKAGE = stringPreferencesKey("widget_tap_package")
 }

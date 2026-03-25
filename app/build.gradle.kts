@@ -4,6 +4,14 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val gitVersionCode = providers.exec {
+    commandLine("git", "rev-list", "--count", "HEAD")
+}.standardOutput.asText.map { it.trim().toIntOrNull() ?: 1 }
+
+val gitVersionName = providers.exec {
+    commandLine("git", "describe", "--tags", "--always")
+}.standardOutput.asText.map { it.trim().removePrefix("v").ifEmpty { "0.0.0" } }
+
 android {
     namespace = "com.wassupluke.simpleweather"
     compileSdk = 36
@@ -12,8 +20,8 @@ android {
         applicationId = "com.wassupluke.simpleweather"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = gitVersionCode.get()
+        versionName = gitVersionName.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

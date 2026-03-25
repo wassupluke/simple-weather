@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple Weather</string>
+    <string name="widget_description">Displays current temperature</string>
+
+    <string name="title_location">Location</string>
+    <string name="label_use_device_location">Use device location</string>
+    <string name="hint_location_input">City, zip code, or lat,lon</string>
+
+    <string name="title_temperature_unit">Temperature Unit</string>
+    <string name="title_update_interval">Update Interval</string>
+    <string name="title_widget_text_color">Widget Text Color</string>
+    <string name="label_text_color">Text color</string>
+    <string name="hint_color_input">#RRGGBB, #AARRGGBB, or name like red</string>
+    <string name="error_invalid_color">Invalid color — enter a hex value or name like \"red\"</string>
+
+    <string name="label_interval">Interval</string>
+    <string name="interval_15min">15 min</string>
+    <string name="interval_30min">30 min</string>
+    <string name="interval_1hr">1 hr</string>
+    <string name="interval_3hr">3 hr</string>
+    <string name="interval_6hr">6 hr</string>
+
+    <string name="action_set">Set</string>
+</resources>

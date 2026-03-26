@@ -24,6 +24,9 @@ git push origin v1.0.0-alpha
 
 Pushing any `v*` tag triggers `.github/workflows/release.yml`, which builds, signs, and publishes the APK. Tags containing a hyphen (e.g. `-alpha`, `-beta`) are automatically marked as pre-releases.
 
+## TODO
+- [ ] Determine if location always allowed is necessary or if only while using is sufficient
+
 ## Wishlist (deferred features)
 
 - [x] Tapping widget can launch the user's choice of weather app

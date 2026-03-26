@@ -1,5 +1,5 @@
 # simple-weather
-A simple weather app.
+A simple weather widget.
 
 ## Project Overview
 

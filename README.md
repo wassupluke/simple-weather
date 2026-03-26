@@ -30,3 +30,8 @@ Pushing any `v*` tag triggers `.github/workflows/release.yml`, which builds, sig
 - [x] Ability to lock in a typed setting (e.g., location or text color) by hitting Return/ Enter
 - [ ] Widget: condition icon, high/low temperatures, font picker
 - [ ] v2: Room + Hilt migration, temperature trend sparkline widget (12/24hr graph)
+- [ ] Settings page follows device theme
+- [ ] More guestures on widget (e.g., swipeUp can be set to launch a different app than tap)
+- [ ] Advanced tap actions to launch specific app activity
+- [ ] Minimally / cleanly support displaying even more data: humidity, wind speed or chill, UV, AQI, precip chance
+- [ ] Make a stinkin app icon already

@@ -44,7 +44,7 @@ class WeatherWidget : GlanceAppWidget() {
                 }
 
                 val textColorProvider: ColorProvider = if (dynamicColor) {
-                    GlanceTheme.colors.onBackground
+                    GlanceTheme.colors.primary
                 } else {
                     val resolved = parseColorSafe(colorString)?.let { argb ->
                         Color(

@@ -33,7 +33,7 @@ val WIDGET_DYNAMIC_COLOR = booleanPreferencesKey("widget_dynamic_color")
 `WeatherWidget.kt` wraps `WeatherWidgetContent` in `GlanceTheme { }`.
 
 Color resolution:
-- `dynamicColor = true`, API 31+: use `GlanceTheme.colors.onBackground`
+- `dynamicColor = true`, API 31+: use `GlanceTheme.colors.primary`
 - `dynamicColor = true`, pre-API 31: `ColorProvider(Color.White)` fallback
 - `dynamicColor = false`: existing `ColorProvider(textColor)` path, unchanged
 
@@ -57,5 +57,5 @@ Color resolution:
 ## Non-Goals
 
 - No manual palette extraction (`WallpaperManager` API not used)
-- No dark/light mode color override — `GlanceTheme.colors.onBackground` handles this automatically
+- No dark/light mode color override — `GlanceTheme.colors.primary` handles this automatically
 - No UI on pre-API 31 devices

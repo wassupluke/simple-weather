@@ -205,7 +205,7 @@ git commit -m "feat: add widgetDynamicColor to SettingsViewModel with smart-defa
 
 **Background — Glance color resolution:**
 
-`GlanceTheme` (from `androidx.glance.material3`) is a Composable that provides Material You colors. Inside it, `GlanceTheme.colors.onBackground` is a `ColorProvider` that resolves to the wallpaper-seeded palette on API 31+, and a baseline scheme below that. We pass `ColorProvider` directly to `WeatherWidgetContent` rather than a resolved `Color`, so Glance can perform light/dark resolution at render time.
+`GlanceTheme` (from `androidx.glance.material3`) is a Composable that provides Material You colors. Inside it, `GlanceTheme.colors.primary` is a `ColorProvider` that resolves to the wallpaper-seeded palette on API 31+, and a baseline scheme below that. We pass `ColorProvider` directly to `WeatherWidgetContent` rather than a resolved `Color`, so Glance can perform light/dark resolution at render time.
 
 **Step 1: Apply the changes**
 
@@ -260,7 +260,7 @@ class WeatherWidget : GlanceAppWidget() {
 
                 val textColorProvider: ColorProvider = when {
                     dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
-                        GlanceTheme.colors.onBackground
+                        GlanceTheme.colors.primary
                     dynamicColor ->
                         ColorProvider(Color.White)
                     else -> {

@@ -66,6 +66,8 @@ internal fun SettingsScreenContent(
     onSetWidgetTextColor: (String) -> Unit,
     onSetWidgetTapPackage: (String) -> Unit,
     onSetWidgetDynamicColor: (Boolean) -> Unit,
+    onSetFontSize: (Int) -> Unit,
+    onSetAlarmWidgetTapPackage: (String) -> Unit,
 ) {
     var locationInput by remember { mutableStateOf("") }
     var locationInputInitialized by remember { mutableStateOf(false) }
@@ -77,6 +79,7 @@ internal fun SettingsScreenContent(
     }
 
     var showAppPicker by remember { mutableStateOf(false) }
+    var showAlarmAppPicker by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val installedApps by produceState(emptyList()) {
@@ -291,6 +294,22 @@ internal fun SettingsScreenContent(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+            Text(stringResource(R.string.title_font_size), style = MaterialTheme.typography.titleSmall)
+            Slider(
+                value = uiState.fontSize.toFloat(),
+                onValueChange = { onSetFontSize(it.toInt()) },
+                valueRange = 12f..96f,
+                steps = 83,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = "${uiState.fontSize}sp",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
             Text(
                 stringResource(R.string.title_widget_tap_action),
                 style = MaterialTheme.typography.titleSmall
@@ -418,6 +437,137 @@ internal fun SettingsScreenContent(
                 }
             }
 
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            Text(stringResource(R.string.title_alarm_widget), style = MaterialTheme.typography.titleSmall)
+
+            Text(
+                stringResource(R.string.title_alarm_widget_tap_action),
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            val selectedAlarmAppInfo = remember(uiState.alarmWidgetTapPackage) {
+                if (uiState.alarmWidgetTapPackage.isEmpty()) null
+                else runCatching {
+                    context.packageManager.getApplicationInfo(uiState.alarmWidgetTapPackage, 0)
+                }.getOrNull()
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showAlarmAppPicker = true }
+                    .padding(vertical = 8.dp)
+            ) {
+                if (selectedAlarmAppInfo != null) {
+                    val icon by produceState<ImageBitmap?>(null, uiState.alarmWidgetTapPackage) {
+                        value = withContext(Dispatchers.IO) {
+                            runCatching {
+                                context.packageManager
+                                    .getApplicationIcon(uiState.alarmWidgetTapPackage)
+                                    .toBitmap()
+                                    .asImageBitmap()
+                            }.getOrNull()
+                        }
+                    }
+                    if (icon != null) {
+                        Image(
+                            bitmap = icon!!,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp).padding(end = 8.dp)
+                        )
+                    } else {
+                        Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    }
+                    Text(
+                        text = selectedAlarmAppInfo.loadLabel(context.packageManager).toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                } else if (uiState.alarmWidgetTapPackage.isNotEmpty()) {
+                    Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    Text(
+                        text = stringResource(R.string.label_selected_app_not_found),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Spacer(Modifier.size(40.dp).padding(end = 8.dp))
+                    Text(
+                        text = stringResource(R.string.label_widget_tap_none),
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (showAlarmAppPicker) {
+                ModalBottomSheet(onDismissRequest = { showAlarmAppPicker = false }) {
+                    LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onSetAlarmWidgetTapPackage("")
+                                        showAlarmAppPicker = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                Spacer(Modifier.size(40.dp).padding(end = 12.dp))
+                                Text(
+                                    text = stringResource(R.string.label_widget_tap_none),
+                                    modifier = Modifier.weight(1f)
+                                )
+                                if (uiState.alarmWidgetTapPackage.isEmpty()) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                        items(installedApps) { entry ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onSetAlarmWidgetTapPackage(entry.pkg)
+                                        showAlarmAppPicker = false
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                if (entry.icon != null) {
+                                    Image(
+                                        bitmap = entry.icon,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(40.dp).padding(end = 12.dp)
+                                    )
+                                } else {
+                                    Spacer(Modifier.size(40.dp).padding(end = 12.dp))
+                                }
+                                Text(entry.label, modifier = Modifier.weight(1f))
+                                if (entry.pkg == uiState.alarmWidgetTapPackage) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -449,6 +599,8 @@ fun SettingsScreen(
         onSetWidgetTextColor = { viewModel.setWidgetTextColor(it) },
         onSetWidgetTapPackage = { viewModel.setWidgetTapPackage(it) },
         onSetWidgetDynamicColor = { viewModel.setWidgetDynamicColor(it) },
+        onSetFontSize = { viewModel.setFontSize(it) },
+        onSetAlarmWidgetTapPackage = { viewModel.setAlarmWidgetTapPackage(it) },
     )
 }
 
@@ -476,6 +628,8 @@ private fun SettingsScreenEmptyPreview() {
             onSetWidgetTextColor = {},
             onSetWidgetTapPackage = {},
             onSetWidgetDynamicColor = {},
+            onSetFontSize = {},
+            onSetAlarmWidgetTapPackage = {},
         )
     }
 }
@@ -497,6 +651,8 @@ private fun SettingsScreenDeviceLocationPreview() {
             onSetWidgetTextColor = {},
             onSetWidgetTapPackage = {},
             onSetWidgetDynamicColor = {},
+            onSetFontSize = {},
+            onSetAlarmWidgetTapPackage = {},
         )
     }
 }
@@ -522,6 +678,8 @@ private fun SettingsScreenManualLocationPreview() {
             onSetWidgetTextColor = {},
             onSetWidgetTapPackage = {},
             onSetWidgetDynamicColor = {},
+            onSetFontSize = {},
+            onSetAlarmWidgetTapPackage = {},
         )
     }
 }

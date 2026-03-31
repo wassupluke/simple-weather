@@ -66,10 +66,13 @@ class WeatherWidget : GlanceAppWidget() {
                     actionStartActivity<MainActivity>()
                 }
 
+                val fontSize = prefs[WeatherDataStore.FONT_SIZE] ?: WeatherDataStore.DEFAULT_FONT_SIZE
+
                 WeatherWidgetContent(
                     displayTemp = displayTemp,
                     textColorProvider = textColorProvider,
-                    tapAction = tapAction
+                    tapAction = tapAction,
+                    fontSize = fontSize
                 )
             }
         }
@@ -84,7 +87,8 @@ class WeatherWidget : GlanceAppWidget() {
 private fun WeatherWidgetContent(
     displayTemp: String,
     textColorProvider: ColorProvider,
-    tapAction: Action
+    tapAction: Action,
+    fontSize: Int
 ) {
     Box(
         modifier = GlanceModifier
@@ -95,7 +99,7 @@ private fun WeatherWidgetContent(
         Text(
             text = displayTemp,
             style = TextStyle(
-                fontSize = 48.sp,
+                fontSize = fontSize.sp,
                 fontWeight = FontWeight.Normal,
                 color = textColorProvider
             )

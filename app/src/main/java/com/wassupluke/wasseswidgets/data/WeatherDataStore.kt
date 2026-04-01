@@ -38,7 +38,7 @@ fun parseColorSafe(colorString: String): Int? {
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "weather_settings")
 
 object WeatherDataStore {
-    const val DEFAULT_TEMP_UNIT = "C"
+    const val DEFAULT_TEMP_UNIT = "F"
     const val DEFAULT_INTERVAL_MINUTES = 60
 
     val USE_DEVICE_LOCATION = booleanPreferencesKey("use_device_location")

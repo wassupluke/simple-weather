@@ -1,6 +1,7 @@
 package com.wassupluke.wasseswidgets.widget
 
 import android.app.AlarmManager
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.datastore.preferences.core.edit
@@ -24,7 +25,8 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
             AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED,
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_TIME_CHANGED,
-            Intent.ACTION_TIMEZONE_CHANGED -> updateAlarmText(context)
+            Intent.ACTION_TIMEZONE_CHANGED,
+            AppWidgetManager.ACTION_APPWIDGET_UPDATE -> updateAlarmText(context)
         }
     }
 

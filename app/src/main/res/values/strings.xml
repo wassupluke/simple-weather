@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simple Weather</string>
+    <string name="app_name">Wasses Widgets</string>
     <string name="widget_description">Displays current temperature</string>
 
     <string name="title_location">Location</string>
@@ -25,11 +25,10 @@
     <string name="action_set">Set</string>
 
     <string name="title_font_size">Widget font size</string>
-    <string name="title_alarm_widget">Alarm widget</string>
-    <string name="title_alarm_widget_tap_action">Alarm widget tap action</string>
-    <string name="alarm_widget_description">Simple Alarm Widget</string>
+    <string name="title_alarm_widget">Alarm widget tap action</string>
+    <string name="alarm_widget_description">Wasses Alarm Widget</string>
 
-    <string name="title_widget_tap_action">Widget tap action</string>
-    <string name="label_widget_tap_none">None (opens Simple Weather)</string>
+    <string name="title_widget_tap_action">Weather widget tap action</string>
+    <string name="label_widget_tap_none">None (opens Wasses Widgets)</string>
     <string name="label_selected_app_not_found">Selected app not found</string>
 </resources>

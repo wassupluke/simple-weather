@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.glance.*
@@ -22,6 +23,7 @@ import com.wassupluke.wasseswidgets.data.resolveDynamicColor
 import com.wassupluke.wasseswidgets.ui.MainActivity
 import kotlin.math.roundToInt
 
+@SuppressLint("RestrictedApi")
 class WeatherWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -44,7 +46,7 @@ class WeatherWidget : GlanceAppWidget() {
                     GlanceTheme.colors.primary
                 } else {
                     val argb = parseColorSafe(colorString) ?: android.graphics.Color.WHITE
-                    ColorProvider(argb)
+                    ColorProvider(Color(argb))
                 }
 
                 val tapPackage = prefs[WeatherDataStore.WIDGET_TAP_PACKAGE]

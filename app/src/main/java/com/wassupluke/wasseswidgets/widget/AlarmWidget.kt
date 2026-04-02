@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import com.wassupluke.wasseswidgets.data.parseColorSafe
 import com.wassupluke.wasseswidgets.data.resolveDynamicColor
 import com.wassupluke.wasseswidgets.ui.MainActivity
 
+@SuppressLint("RestrictedApi")
 class AlarmWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -43,7 +45,7 @@ class AlarmWidget : GlanceAppWidget() {
                     GlanceTheme.colors.primary
                 } else {
                     val argb = parseColorSafe(colorString) ?: android.graphics.Color.WHITE
-                    ColorProvider(argb)
+                    ColorProvider(Color(argb))
                 }
 
                 val tapPackage = prefs[WeatherDataStore.ALARM_WIDGET_TAP_PACKAGE]

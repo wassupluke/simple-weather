@@ -6,5 +6,5 @@
     android:targetCellWidth="2"
     android:targetCellHeight="1"
     android:updatePeriodMillis="0"
-    android:description="@string/widget_temperature_description"
+    android:description="@string/widget_alarm_description"
     android:resizeMode="horizontal|vertical" />

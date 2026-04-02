@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simple Weather</string>
-    <string name="widget_description">Displays current temperature</string>
+    <string name="app_name">Widgets</string>
 
-    <string name="title_location">Location</string>
-    <string name="label_use_device_location">Use device location</string>
-    <string name="hint_location_input">City, zip code, or lat,lon</string>
+    <!-- Widget picker labels and descriptions -->
+    <string name="widget_temperature_label">Temperature</string>
+    <string name="widget_temperature_description">Shows the current temperature on your home screen</string>
+    <string name="widget_alarm_label">Next Alarm</string>
+    <string name="widget_alarm_description">Shows your next scheduled alarm on your home screen</string>
+    <string name="widget_alarm_none">No alarm</string>
 
-    <string name="title_temperature_unit">Temperature Unit</string>
-    <string name="title_update_interval">Update Interval</string>
-    <string name="title_widget_text_color">Widget Text Color</string>
-    <string name="label_dynamic_color">Dynamic color</string>
-    <string name="label_text_color">Text color</string>
-    <string name="hint_color_input">#RRGGBB, #AARRGGBB, or name like red</string>
-    <string name="error_invalid_color">Invalid color — enter a hex value or name like \"red\"</string>
+    <!-- Settings: Location -->
+    <string name="settings_location_title">Location</string>
+    <string name="settings_location_device_label">Use device location</string>
+    <string name="settings_location_hint">City, zip code, or lat,lon</string>
 
-    <string name="label_interval">Interval</string>
-    <string name="interval_15min">15 min</string>
-    <string name="interval_30min">30 min</string>
-    <string name="interval_1hr">1 hr</string>
-    <string name="interval_3hr">3 hr</string>
-    <string name="interval_6hr">6 hr</string>
+    <!-- Settings: Temperature -->
+    <string name="settings_temperature_unit_title">Temperature Unit</string>
 
+    <!-- Settings: Update interval -->
+    <string name="settings_update_interval_title">Update Interval</string>
+    <string name="settings_interval_label">Interval</string>
+    <string name="settings_interval_15min">15 min</string>
+    <string name="settings_interval_30min">30 min</string>
+    <string name="settings_interval_1hr">1 hr</string>
+    <string name="settings_interval_3hr">3 hr</string>
+    <string name="settings_interval_6hr">6 hr</string>
+
+    <!-- Settings: Appearance (shared by all widgets) -->
+    <string name="settings_dynamic_color_label">Dynamic color</string>
+    <string name="settings_text_color_title">Widget Text Color</string>
+    <string name="settings_text_color_label">Text color</string>
+    <string name="settings_color_hint">#RRGGBB, #AARRGGBB, or name like red</string>
+    <string name="settings_color_error">Invalid color — enter a hex value or name like \"red\"</string>
+    <string name="settings_font_size_title">Widget font size</string>
+
+    <!-- Settings: Weather widget -->
+    <string name="settings_weather_tap_title">Weather widget tap action</string>
+
+    <!-- Settings: Alarm widget -->
+    <string name="settings_alarm_tap_title">Alarm widget tap action</string>
+
+    <!-- Settings: Shared tap-action UI -->
+    <string name="settings_tap_none_label">None (opens Widgets)</string>
+    <string name="settings_tap_app_missing_label">Selected app not found</string>
+
+    <!-- Actions -->
     <string name="action_set">Set</string>
-
-    <string name="title_widget_tap_action">Widget tap action</string>
-    <string name="label_widget_tap_none">None (opens Simple Weather)</string>
-    <string name="label_selected_app_not_found">Selected app not found</string>
 </resources>

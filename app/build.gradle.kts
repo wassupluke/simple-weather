@@ -13,11 +13,11 @@ val gitVersionName = providers.exec {
 }.standardOutput.asText.map { it.trim().removePrefix("v").ifEmpty { "0.0.0" } }
 
 android {
-    namespace = "com.wassupluke.simpleweather"
+    namespace = "com.wassupluke.widgets"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.wassupluke.simpleweather"
+        applicationId = "com.wassupluke.widgets"
         minSdk = 26
         targetSdk = 36
         versionCode = gitVersionCode.get()

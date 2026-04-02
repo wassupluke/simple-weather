@@ -26,12 +26,14 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_TIMEZONE_CHANGED,
-            AppWidgetManager.ACTION_APPWIDGET_UPDATE -> updateAlarmText(context)
+            AppWidgetManager.ACTION_APPWIDGET_UPDATE -> updateAlarmText(context, intent.action ?: "")
         }
     }
 
-    private fun updateAlarmText(context: Context) {
-        val pendingResult = goAsync()
+    private fun updateAlarmText(context: Context, action: String) {
+        // APPWIDGET_UPDATE: super already called goAsync() internally — calling it again returns null.
+        // For all other broadcasts, goAsync() is available and needed to keep the process alive.
+        val pendingResult = if (action != AppWidgetManager.ACTION_APPWIDGET_UPDATE) goAsync() else null
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -44,7 +46,7 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
                 context.dataStore.edit { it[WeatherDataStore.ALARM_TEXT] = alarmText }
                 AlarmWidget().updateAll(context)
             } finally {
-                pendingResult.finish()
+                pendingResult?.finish()
             }
         }
     }

@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.datastore.preferences.core.edit
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -42,7 +43,13 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
                 val alarmText = if (nextAlarm == null) {
                     context.getString(R.string.widget_alarm_none)
                 } else {
-                    DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(nextAlarm.triggerTime))
+                    val creator = nextAlarm.showIntent?.creatorPackage
+                    val fromClockApp = creator != null && isUserFacingApp(context, creator)
+                    if (fromClockApp) {
+                        DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(nextAlarm.triggerTime))
+                    } else {
+                        context.getString(R.string.widget_alarm_none)
+                    }
                 }
                 context.dataStore.edit { it[WeatherDataStore.ALARM_TEXT] = alarmText }
                 AlarmWidget().updateAll(context)
@@ -50,5 +57,13 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
                 pendingResult?.finish()
             }
         }
+    }
+
+    private fun isUserFacingApp(context: Context, packageName: String): Boolean {
+        val intent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+            setPackage(packageName)
+        }
+        return context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isNotEmpty()
     }
 }

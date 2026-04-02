@@ -83,24 +83,25 @@ private fun AlarmWidgetContent(
         modifier = GlanceModifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Box(modifier = GlanceModifier.clickable(tapAction)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    provider = ImageProvider(R.drawable.ic_alarm),
-                    contentDescription = null,
-                    modifier = GlanceModifier.size(fontSize.dp),
-                    colorFilter = ColorFilter.tint(textColorProvider)
+        Row(
+            modifier = GlanceModifier.clickable(tapAction),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                provider = ImageProvider(R.drawable.ic_alarm),
+                contentDescription = null,
+                modifier = GlanceModifier.size(fontSize.dp),
+                colorFilter = ColorFilter.tint(textColorProvider)
+            )
+            Spacer(GlanceModifier.width(4.dp))
+            Text(
+                text = alarmText,
+                style = TextStyle(
+                    fontSize = fontSize.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = textColorProvider
                 )
-                Spacer(GlanceModifier.width(4.dp))
-                Text(
-                    text = alarmText,
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = textColorProvider
-                    )
-                )
-            }
+            )
         }
     }
 }

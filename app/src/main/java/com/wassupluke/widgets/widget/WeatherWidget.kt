@@ -90,15 +90,14 @@ private fun WeatherWidgetContent(
         modifier = GlanceModifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Box(modifier = GlanceModifier.clickable(tapAction)) {
-            Text(
-                text = displayTemp,
-                style = TextStyle(
-                    fontSize = fontSize.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = textColorProvider
-                )
+        Text(
+            text = displayTemp,
+            modifier = GlanceModifier.clickable(tapAction),
+            style = TextStyle(
+                fontSize = fontSize.sp,
+                fontWeight = FontWeight.Normal,
+                color = textColorProvider
             )
-        }
+        )
     }
 }

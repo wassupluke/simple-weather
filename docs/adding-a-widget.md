@@ -40,7 +40,17 @@ Shared strings (`settings_tap_none_label`, `settings_tap_app_missing_label`, app
 
 ### `<Name>Widget.kt`
 
-Mirror `WeatherWidget.kt` or `AlarmWidget.kt`. All widgets share these DataStore keys:
+Mirror `WeatherWidget.kt` or `AlarmWidget.kt`. **Do not extract a shared root composable** (e.g. a `WidgetRoot` helper) that is reused across multiple `GlanceAppWidget` subclasses — Glance can assign the same layout resource ID to widgets that share composable functions, causing one widget's content to appear on another. Each widget's `Content` composable must own its full scaffold:
+
+```kotlin
+Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = GlanceModifier.clickable(tapAction)) {
+        // widget-specific content here
+    }
+}
+```
+
+All widgets share these DataStore keys:
 - `WIDGET_TEXT_COLOR` + `WIDGET_DYNAMIC_COLOR` + `resolveDynamicColor()` — color
 - `FONT_SIZE` / `DEFAULT_FONT_SIZE` — font size
 - Widget-specific tap key: `<NAME>_WIDGET_TAP_PACKAGE`

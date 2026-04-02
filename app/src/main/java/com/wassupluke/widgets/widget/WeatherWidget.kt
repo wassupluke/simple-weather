@@ -11,9 +11,13 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.glance.*
 import androidx.glance.action.Action
 import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.GlanceTheme
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 import com.wassupluke.widgets.data.WeatherDataStore
@@ -82,14 +86,19 @@ private fun WeatherWidgetContent(
     tapAction: Action,
     fontSize: Int
 ) {
-    WidgetRoot(tapAction = tapAction) {
-        Text(
-            text = displayTemp,
-            style = TextStyle(
-                fontSize = fontSize.sp,
-                fontWeight = FontWeight.Normal,
-                color = textColorProvider
+    Box(
+        modifier = GlanceModifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(modifier = GlanceModifier.clickable(tapAction)) {
+            Text(
+                text = displayTemp,
+                style = TextStyle(
+                    fontSize = fontSize.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = textColorProvider
+                )
             )
-        )
+        }
     }
 }

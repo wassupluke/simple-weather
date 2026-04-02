@@ -12,10 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.*
 import androidx.glance.action.Action
 import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Row
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.size
 import androidx.glance.layout.width
@@ -76,23 +79,28 @@ private fun AlarmWidgetContent(
     tapAction: Action,
     fontSize: Int
 ) {
-    WidgetRoot(tapAction = tapAction) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_alarm),
-                contentDescription = null,
-                modifier = GlanceModifier.size(fontSize.dp),
-                colorFilter = ColorFilter.tint(textColorProvider)
-            )
-            Spacer(GlanceModifier.width(4.dp))
-            Text(
-                text = alarmText,
-                style = TextStyle(
-                    fontSize = fontSize.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = textColorProvider
+    Box(
+        modifier = GlanceModifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(modifier = GlanceModifier.clickable(tapAction)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_alarm),
+                    contentDescription = null,
+                    modifier = GlanceModifier.size(fontSize.dp),
+                    colorFilter = ColorFilter.tint(textColorProvider)
                 )
-            )
+                Spacer(GlanceModifier.width(4.dp))
+                Text(
+                    text = alarmText,
+                    style = TextStyle(
+                        fontSize = fontSize.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = textColorProvider
+                    )
+                )
+            }
         }
     }
 }

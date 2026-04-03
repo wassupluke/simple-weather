@@ -21,7 +21,10 @@ import com.wassupluke.widgets.data.dataStore
 import com.wassupluke.widgets.ui.settings.SettingsScreen
 import com.wassupluke.widgets.ui.settings.SettingsViewModel
 import com.wassupluke.widgets.ui.theme.SimpleWeatherTheme
+import com.wassupluke.widgets.widget.AlarmWidget
+import com.wassupluke.widgets.widget.WeatherWidget
 import com.wassupluke.widgets.worker.WorkScheduler
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -53,8 +56,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Schedule WorkManager on first launch (if location is already set)
         lifecycleScope.launch(Dispatchers.IO) {
+            // Force both widgets to re-render, re-establishing correct Glance
+            // state mapping in case it drifted after a force-stop or update
+            WeatherWidget().updateAll(applicationContext)
+            AlarmWidget().updateAll(applicationContext)
+
+            // Schedule WorkManager (if location is already set)
             val prefs = applicationContext.dataStore.data.first()
             val lat = prefs[WeatherDataStore.LOCATION_LAT]
             val lon = prefs[WeatherDataStore.LOCATION_LON]

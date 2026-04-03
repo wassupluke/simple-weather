@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.datastore.preferences.core.edit
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -59,11 +58,6 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
         }
     }
 
-    private fun isUserFacingApp(context: Context, packageName: String): Boolean {
-        val intent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-            setPackage(packageName)
-        }
-        return context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isNotEmpty()
-    }
+    private fun isUserFacingApp(context: Context, packageName: String): Boolean =
+        context.packageManager.getLaunchIntentForPackage(packageName) != null
 }

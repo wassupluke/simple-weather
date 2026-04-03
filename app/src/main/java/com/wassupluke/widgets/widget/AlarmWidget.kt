@@ -11,7 +11,6 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.compose.ui.unit.dp
 import androidx.glance.*
 import androidx.glance.action.Action
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
@@ -30,7 +29,6 @@ import com.wassupluke.widgets.data.WeatherDataStore
 import com.wassupluke.widgets.data.dataStore
 import com.wassupluke.widgets.data.parseColorSafe
 import com.wassupluke.widgets.data.resolveDynamicColor
-import com.wassupluke.widgets.ui.MainActivity
 
 @SuppressLint("RestrictedApi")
 class AlarmWidget : GlanceAppWidget() {
@@ -51,14 +49,7 @@ class AlarmWidget : GlanceAppWidget() {
                     ColorProvider(Color(argb))
                 }
 
-                val tapPackage = prefs[WeatherDataStore.ALARM_WIDGET_TAP_PACKAGE]
-                val tapAction: Action = if (!tapPackage.isNullOrEmpty()) {
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(tapPackage)
-                    if (launchIntent?.component != null) actionStartActivity(launchIntent.component!!)
-                    else actionStartActivity<MainActivity>()
-                } else {
-                    actionStartActivity<MainActivity>()
-                }
+                val tapAction = resolveTapAction(context, prefs[WeatherDataStore.ALARM_WIDGET_TAP_PACKAGE])
 
                 AlarmWidgetContent(
                     alarmText = alarmText,

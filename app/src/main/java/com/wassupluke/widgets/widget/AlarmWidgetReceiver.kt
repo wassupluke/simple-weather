@@ -13,6 +13,7 @@ import com.wassupluke.widgets.data.WeatherDataStore
 import com.wassupluke.widgets.data.dataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
@@ -50,8 +51,11 @@ class AlarmWidgetReceiver : GlanceAppWidgetReceiver() {
                         context.getString(R.string.widget_alarm_none)
                     }
                 }
-                context.dataStore.edit { it[WeatherDataStore.ALARM_TEXT] = alarmText }
-                AlarmWidget().updateAll(context)
+                val current = context.dataStore.data.first()[WeatherDataStore.ALARM_TEXT]
+                if (alarmText != current) {
+                    context.dataStore.edit { it[WeatherDataStore.ALARM_TEXT] = alarmText }
+                    AlarmWidget().updateAll(context)
+                }
             } finally {
                 pendingResult?.finish()
             }

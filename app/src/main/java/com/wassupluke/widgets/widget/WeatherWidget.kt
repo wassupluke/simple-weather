@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.glance.*
 import androidx.glance.action.Action
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
@@ -24,7 +23,6 @@ import com.wassupluke.widgets.data.WeatherDataStore
 import com.wassupluke.widgets.data.dataStore
 import com.wassupluke.widgets.data.parseColorSafe
 import com.wassupluke.widgets.data.resolveDynamicColor
-import com.wassupluke.widgets.ui.MainActivity
 import kotlin.math.roundToInt
 
 @SuppressLint("RestrictedApi")
@@ -53,14 +51,7 @@ class WeatherWidget : GlanceAppWidget() {
                     ColorProvider(Color(argb))
                 }
 
-                val tapPackage = prefs[WeatherDataStore.WIDGET_TAP_PACKAGE]
-                val tapAction = if (!tapPackage.isNullOrEmpty()) {
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(tapPackage)
-                    if (launchIntent?.component != null) actionStartActivity(launchIntent.component!!)
-                    else actionStartActivity<MainActivity>()
-                } else {
-                    actionStartActivity<MainActivity>()
-                }
+                val tapAction = resolveTapAction(context, prefs[WeatherDataStore.WIDGET_TAP_PACKAGE])
 
                 val fontSize = prefs[WeatherDataStore.FONT_SIZE] ?: WeatherDataStore.DEFAULT_FONT_SIZE
 
